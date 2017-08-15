@@ -1,5 +1,6 @@
 /* Class MyTryLock - MJS 8.5.17
    Added Master Line while unicorn branch open.
+   Added Master Line2 while unicorn branch open.
    This class implements 4 overloaded versions of static MyTryLock function. 
    The method with all parameters calls tryLock with a total wait time, a boolean 
    indicating if to ask the user to continue waiting, a prompt for this message, 
