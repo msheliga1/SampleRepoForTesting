@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 
 public class MyTryLock {
 
-    static final int TICK_TIME = 100;  // divide total wait time into chunks of this amount
+    static final int TICK_TIME = 50;  // divide total wait time into chunks of this amount in millisecs
 
     // Method expands on tryLock method from fileChannels - adds timeout time if we should keep
     // trying, and queryUser to see if user should be queried after timeout time, msg to 
