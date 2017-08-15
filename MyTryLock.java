@@ -1,4 +1,7 @@
 /* Class MyTryLock - MJS 8.5.17
+   Line added after unicorn merge.
+   Added Master Line while unicorn branch open.
+   Added Master Line2 while unicorn branch open.
    This class implements 4 overloaded versions of static MyTryLock function. 
    The method with all parameters calls tryLock with a total wait time, a boolean 
    indicating if to ask the user to continue waiting, a prompt for this message, 
@@ -8,7 +11,7 @@
    and has around 30 methods, this would take quite a bit of doing.
    New Line in Unicorn Branch
    New Line2 in Unicorn Branch
-   Post merge add in Unicorn.
+   Conflicting Line in Master
 */
     
 package util;
