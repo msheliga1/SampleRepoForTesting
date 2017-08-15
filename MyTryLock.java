@@ -6,6 +6,7 @@
    The other 3 overloaded methods call the full parameter method with default values.
    Ideally this would extend nio.channels.FileChannel, but since FileChannel is abstract
    and has around 30 methods, this would take quite a bit of doing.
+   New Line in Unicorn Branch
 */
     
 package util;
