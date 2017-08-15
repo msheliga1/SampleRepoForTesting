@@ -1,4 +1,5 @@
 /* Class MyTryLock - MJS 8.5.17
+   Line added after unicorn merge.
    Added Master Line while unicorn branch open.
    Added Master Line2 while unicorn branch open.
    This class implements 4 overloaded versions of static MyTryLock function. 
