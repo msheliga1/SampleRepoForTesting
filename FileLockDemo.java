@@ -11,7 +11,7 @@ will crash.  Lock seems to forcefully block the second process to call it.
 */
   
 package demos;             // demo program to test locks - mainly using high score samples 
-import games.HighScore; 
+import games.HighScore;  
 import games.HighScoreFile;
 import games.HighScoreClassInfo;
 import games.HighScoreProcessor;
@@ -144,6 +144,8 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
     // Display a message of file RW failure if its called for.
     @Override
     public void displayReadWriteFailureMessage(int failures, String reason)  {
+    	// failures - number of times attempt to RW file has failed.
+    	// reason - text message explaining why RW failed.
         // System.out.println("displayReadWriteFailureMessage - Starting");
         String newLine = System.lineSeparator();
         if (failures == 1) {
@@ -158,7 +160,7 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
         }
         if (failures == MAX_READ_WRITE_FAILURES) {
             StringBuilder msg = new StringBuilder("Could not read-write file after ");
-            msg.append(MAX_READ_WRITE_FAILURES + " tries." + newLine);
+            msg.append(MAX_READ_WRITE_FAILURES + " tries." + newLine + newLine);
             msg.append("Giving up on saving score to the file and saving all scores locally only.");
             JOptionPane.showMessageDialog(null, msg.toString());
         }         
@@ -168,8 +170,7 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
     // this works - seek(0) after reading will overwrite file.
     @Override
     public void addNewScore(int newScore)  {
-
-        // ready to add new high score - synch for reread-update-write 
+        // ready to add a new score - synch for reread-update-write 
         String prompt = null;
         HighScore newHigh = null;
         List<HighScore> fileScores = new ArrayList<>();
@@ -189,7 +190,9 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
         }
 
         // if file is read-write-able, wait for file lock to be released.
-        if (!canReadWriteFile) {
+        if (unsureIfCanReadWriteFile()) {
+        	reason = " becuase it is uncertain if the file can be read and writtenm.";
+        } else if (!canReadWriteFile) {
             reason = " because file can't be read and written";
         } else { // canRWFile . . . try to do so now.
             try (RandomAccessFile raf = new RandomAccessFile(file, "rw");
@@ -204,7 +207,7 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
  
                 System.out.println("FileLockDemo:Add - canRW file - tried lock = " + lockRaf);
                 if (lockRaf == null) {
-                    reason = " because file is locked";
+                    reason = " because the file is locked"; 
                 } else {                   
                     // User input can take very long, so dont make it thread protected *normally*.
                     // but for tesing purposes, we do so here.
@@ -220,11 +223,11 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
                     Collections.sort(fileScores);
                     while (fileScores.size() > MAX_HIGH_SCORES) fileScores.remove(MAX_HIGH_SCORES);
 
-                    raf.seek(0);  // witout this print writes to after last read location.
+                    raf.seek(0);  // without this print will write to after last read location.
                     HighScoreFile.writeHighScoresToFile(fileScores, pw);
-                } // end if notLocked . . . fil
+                } // end if locked or not 
             } catch (OverlappingFileLockException e) {
-                    reason = " because file already locked.";
+                    reason = " because the file is already locked.";
             } catch (ClosedChannelException e) {
                     // this can be thrown during twr autoclose!! MJS 8.6.17
                     reason = " because of a file lock problem (" + e.getClass().getSimpleName();
@@ -232,9 +235,9 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
             } catch (FileNotFoundException e) {
                     reason = " because the file is not found: " + file;
             } catch (IOException e) {
-                    reason = "IO Exception for file: " + e.getClass().getSimpleName();
+                    reason = " because of an IO Exception for file: " + e.getClass().getSimpleName();
             } catch (Exception e) {
-                    reason = "Non-IO Exception creating file: " + e.getClass().getSimpleName();
+                    reason = " because of a Non-IO Exception creating file: " + e.getClass().getSimpleName();
             } // end try-catch lock-file
         } // end if canRWFile
         if (reason == null || reason == "") {   // data added sucessfully - no fileLock or exceptions
@@ -250,8 +253,9 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
             // sort, delete if too large
             Collections.sort(highScores);
             System.out.println("FileLockDemo:Add - added local HS size is " + highScores.size());
-            if (highScores.size() > MAX_HIGH_SCORES) highScores.remove(MAX_HIGH_SCORES);
+            while (highScores.size() > MAX_HIGH_SCORES) highScores.remove(MAX_HIGH_SCORES);
             displayTitle = "High Scores (Local Copy)";
+            reason = "Could not save the new score to a file " + reason;
         }
         displayHighScores(highScores, displayTitle, reason);
     
@@ -264,8 +268,8 @@ public class FileLockDemo extends HighScoreProcessor implements Runnable, HighSc
       String msg = "Welcome to the filelock and score saving demonstartion program. " + newLine + newLine;
       msg += "To see filelocks in action you will need to start 2 versions of this program at once." + newLine;
       msg += "You may do so using a single version of Eclipse, or another IDE." + newLine; 
-      msg += "Alternatively, two different command windows coould be used by typing 'java util.fileLockDemo'," + newLine;
-      msg += "(presuming the program is in the util subdirectory of your java classes directory)." + newLine; 
+      msg += "Alternatively, two different command windows coould be used by typing 'java demos.FileLockDemo'," + newLine;
+      msg += "(presuming the program is in the demos subdirectory of your java classes directory)." + newLine; 
       msg += "Alternatively you may invoke multiple versions of this program using " + newLine;
       msg += "the application manager if you have access to it." + newLine + newLine;
       msg += "In each case the program will need to be able to read and write files to ";
