@@ -4,13 +4,12 @@ Get high scores from blockingQ, get current high scores from file, if new high s
 insert high score into list, write to file.
 */
 
-package games;                  // most games contain high scores 
+package games;                   // most games generate and record high scores 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;  // new Java8 date-time classes
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.BlockingQueue;
 import java.util.Collections;
@@ -123,9 +121,9 @@ public class HighScoreProcessor implements Runnable {
              FileChannel chanRaf = raf.getChannel();
              InputStream is    = Channels.newInputStream(chanRaf);
              BufferedReader br = new BufferedReader(new InputStreamReader(is));
-             FileLock lockRaf  = myTryLock(chanRaf, timeout, queryUser, lockMsg); 
              OutputStream os   = Channels.newOutputStream(chanRaf);
              PrintWriter pw    = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
+                FileLock lockRaf  = myTryLock(chanRaf, timeout, queryUser, lockMsg); 
         		)   {
              // FileLock must be created after PrintWriter, BufferedReader created or else ClosedChannelException
              // ClosedChannelException thrown even though last line of try block executes 
@@ -166,7 +164,7 @@ public class HighScoreProcessor implements Runnable {
                     return;
             } // end try-catch-finally lock-file
         if (result == false) {
-            // increment possibly displaying a message
+            // increment failures, possibly displaying a message
             displayReadWriteFailureMessage(++readWriteFailures, msg.toString());
         } else {
             canReadWriteFile = true;  
@@ -259,7 +257,7 @@ public class HighScoreProcessor implements Runnable {
         // if can RW File ever ... wait for file to be unlocked . . . 
         // try to add it ... if added, update localHS, else add to localHS
         if (!canReadWriteFile) {
-            reason = " because file can't be read and written";
+            reason = " because the file can't be read and written";
         } else {  // canRWFile, try to do so
             try (RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 FileChannel chanRaf = raf.getChannel();
@@ -271,7 +269,7 @@ public class HighScoreProcessor implements Runnable {
                 FileLock lockRaf  = myTryLock(raf.getChannel(), 10000, true, lockMsg); ) {  
         
                 if (lockRaf == null) {
-                    reason = " because file is locked";  // save high-score locally
+                    reason = " because the file is locked";  // save high-score locally
                 } else {
                     System.out.println("Successfully lockedx1 File: " + file);
                     fileScores = HighScoreFile.readHighScoresFromFile(br);
@@ -295,21 +293,21 @@ public class HighScoreProcessor implements Runnable {
             } catch (FileNotFoundException e) {
                 reason = " because the file is not found: " + file;
             } catch (IOException e) {
-                reason = "IO Exception for file: " + e.getClass().getSimpleName();
+                reason = " because of an IO Exception for file: " + e.getClass().getSimpleName();
             } catch (Exception e) {
-                reason = "Non-IO Exception creating file: " + e.getClass().getSimpleName();
+                reason = " because of a Non-IO Exception creating file: " + e.getClass().getSimpleName();
             } // end try-catch lock-file
         } // end if canReadWriteFile
         if (reason == null || reason == "") {
             highScores = fileScores;
-            displayTitle = "High Scores from File";
+            displayTitle = "High Scores of All Time";
         } else { // Couldnt read-write to file => use local array values
             // add, sort, delete if too large
             if (newHigh == null) newHigh = new HighScore(inputHighScoreName(newScore), newScore);
             highScores.add(newHigh);  // add to list of highScores
             Collections.sort(highScores);
             while (highScores.size() > MAX_HIGH_SCORES) highScores.remove(MAX_HIGH_SCORES);
-            displayTitle = "Local Copy of High Scores";
+            displayTitle = "High Scores";
         } // end if reason null or not
         displayHighScores(highScores, displayTitle);
     
@@ -387,6 +385,7 @@ public class HighScoreProcessor implements Runnable {
            builder.append("</td></tr>");        
         }  
         if (errorMsg != null && errorMsg != "")  {
+        	builder.append("<tr> </tr>");
         	builder.append("<tr><td colspan='3'> " + errorMsg + "</td></tr>");
         }
         // need pane, frame or panel here . . . 
