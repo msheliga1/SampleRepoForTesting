@@ -7,6 +7,7 @@
    Ideally this would extend nio.channels.FileChannel, but since FileChannel is abstract
    and has around 30 methods, this would take quite a bit of doing.
    New Line in Unicorn Branch
+   New Line2 in Unicorn Branch
 */
     
 package util;
