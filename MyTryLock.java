@@ -4,6 +4,8 @@
    indicating if to ask the user to continue waiting, a prompt for this message, 
    and a boolean to indicate if the user should be asked how long to contine waiting.
    The other 3 overloaded methods call the full parameter method with default values.
+   Ideally this would extend nio.channels.FileChannel, but since FileChannel is abstract
+   and has around 30 methods, this would take quite a bit of doing.
 */
     
 package util;
