@@ -9,7 +9,8 @@ insert high score into list, write to file.
 /* Results: tryLock always seems to allow execution to proceed, but subsequent read on file 
 will crash.  Lock seems to forcefully block the second process to call it.
 */
-  
+// Comment added to Eclispe Project copied from GitHub 2.2.18 MJS
+
 package demos;             // demo program to test locks - mainly using high score samples 
 import games.HighScore;  
 import games.HighScoreFile;
