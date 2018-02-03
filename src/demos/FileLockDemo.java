@@ -10,6 +10,7 @@ insert high score into list, write to file.
 will crash.  Lock seems to forcefully block the second process to call it.
 */
 // Comment added to Eclispe Project copied from GitHub 2.2.18 MJS
+// Comment with Skip.
 
 package demos;             // demo program to test locks - mainly using high score samples 
 import games.HighScore;  
